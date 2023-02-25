@@ -1,6 +1,6 @@
 /*
 Name: Conner Tamane (100754614) & Grayson Closs (100597686)
-Date Completed: January 24, 2023,
+Date Completed: Feb 19, 2023,
 Course: WEBD6201
 Description: This is the app.js file for our Web Development Work. It Includes changes from the previous assignment to
 function correctly for assignment 2. Here we add a function for validating the register page user inputs. Additionally,
@@ -9,6 +9,8 @@ between the Contact Us link and the logout/login link.
 */
 
 "use strict";
+
+
 
 //IIFE - Immediately Invoked Function Expression
 (function(){
@@ -20,7 +22,7 @@ between the Contact Us link and the logout/login link.
 
         AjaxRequest("GET", "header.html", LoadHeader);
 
-        AjaxRequest("GET", "login.html", CheckLogin);
+
 
         switch(document.title){
             case "Home":
@@ -56,6 +58,7 @@ between the Contact Us link and the logout/login link.
     window.addEventListener("load", Start);
     //if(document.title === "Contact"){DisplayContactPage();}
     //window.addEventListener("load", Debugging);
+
 })();
 
 function AjaxRequest(method, url, callback){
@@ -83,6 +86,8 @@ function LoadHeader(html_data){
 
     $("header").html(html_data);
     $(`li>a:contains(${document.title})`).addClass("active");
+    CheckLogin();
+    SiteWide();
     //$("a.navbar-brand").()
 }
 
@@ -301,6 +306,7 @@ function ValidateRegisterFields(input_field_id, reg_expr, err_msg) {
     });
 }
 
+
 function ValidateContactForm(){
     new ValidateField("#Name",
         /^([A-Z][a-z]{1,3}\.?\s)?([A-Z][a-z]+)+([\s,-]([A-z][a-z]+))*$/,
@@ -314,7 +320,7 @@ function ValidateContactForm(){
 }
 
 function ValidateRegisterForm(){
-    new ValidateRegisterFields("#FirstName", /^[a-zA-Z]{2,}$/,
+    new ValidateRegisterFields("#firstName", /^[a-zA-Z]{2,}$/,
         "Please enter a valid First Name (Minimum 2 characters)");
     new ValidateRegisterFields("#lastName", /^[a-zA-Z]{2,}$/,
         "Please enter a valid Last Name (Minimum 2 characters)");
@@ -324,6 +330,7 @@ function ValidateRegisterForm(){
                         "Please enter a valid Email Address");
     new ValidateRegisterFields("#password", /^.{6,}$/,
                         "Please enter a valid password (must be 6 characters in length)");
+
 }
 
 function DisplayContactPage() {
@@ -358,22 +365,42 @@ function DisplayContactPage() {
 function DisplayRegisterPage() {
     ValidateRegisterForm();
 
-    let sendButton = document.getElementById("submitButton");
-    let firstName  = document.getElementById("FirstName");
-    let lastName = document.getElementById("lastName");
-    let username = document.getElementById("username");
-    let emailAddress = document.getElementById("emailAddress");
-    let password = document.getElementById("password");
+    let errorMessage = $("#ErrorMessage");
 
-    /*sendButton.addEventListener("click", function()){
-        let userInfo = new core.User(firstName.value, lastName.value, username.value, emailAddress.value, password.value);
 
-        if(userInfo.serialize()){
-            let key = userInfo.
+
+
+    $("#submitButton").on("click", function(){
+        event.preventDefault();
+        if(firstName.value !== "" && lastName.value !== "" && username.value !== ""
+            && emailAddress.value !== ""
+            && password.value !== "" && confirmPassword.value !== "" ){
+
+            let success = false;
+
+            let newUser = new core.User(firstName.value, lastName.value, username.value, emailAddress.value, password.value);
+
+            let jsonUser = newUser.toJSON();
+            console.log(jsonUser);
+            setTimeout(function(){location.href = "register.html"}, 4000);
+            // import jsonfile from "./require";
+            // const file = '../data/user.json';
+            // const obj = {jsonUser};
+            //
+            // jsonfile.writeFile(file, obj, function (err){
+            //
+            // })
+
+        } else if(confirmPassword.value !== password.value){
+            errorMessage.addClass("alert alert-danger");
+            errorMessage.show().text("Passwords don't match! :)");
         }
-    }*/
-
-
+        else {
+            console.log("i am here");
+            errorMessage.addClass("alert alert-danger");
+            errorMessage.show().text("Fill out the form!");
+        }
+    });
 }
 
 function DisplayAboutPage() {
@@ -434,7 +461,11 @@ function DisplayLoginPage() {
 
 function CheckLogin() {
 
+    console.log("checklogin loaded up boi");
+
     if(sessionStorage.getItem("user")){
+
+        console.log("in the if in checklogin");
 
         let userData = sessionStorage.getItem("user");
         let loggedUser = new core.User();
@@ -442,7 +473,11 @@ function CheckLogin() {
         console.log(loggedUser.Username);
         $("#login").html(`<a id="logout" class="nav-link" href="#">
             <i class="fas fa-sign-out-alt"></i> Logout</a>`);
-        $(`<li id='user' class='nav-item'><a class='nav-link' href='#'><i class='fas fa-user'></i> ${loggedUser.Username}</a></li>`).insertAfter("ul>li>a[href^='contact.html']");
+        $(`<li id='user' class='nav-item'><a class='nav-link' href='#'><i class='fas fa-user'></i> ${loggedUser.Username}</a></li>`).insertAfter("ul>li#contact");
+        if(document.title === "login.html")
+        {
+            location.href = "index.html";
+        }
     }
 
     $("#logout").on("click", function(){
@@ -507,6 +542,30 @@ function DisplayEditContact() {
 
     }
 
+}
+
+function SiteWide (){
+
+    let newName = document.getElementsByTagName("li")[1];
+    newName.innerHTML = "<a class=\"nav-link\" href=\"products.html\"><i class=\"fa-solid fa-cart-shopping\"></i> Projects</a>";
 
 
+    let ulHeader = document.getElementsByTagName("ul")[0];
+    let hrTag = document.createElement("li");
+    hrTag.setAttribute("id", "humanResources");
+    hrTag.setAttribute("class", "nav-item");
+    ulHeader.getElementsByTagName("li")[3].insertAdjacentElement("afterend", hrTag);
+
+    hrTag.innerHTML = "<a class=\"nav-link\" href=\"hr.html\"><i class=\"fa-solid fa-people-group\"></i> Human Resources</a>";
+
+    let footer = document.getElementsByTagName("main")[0];
+    let footerGuts = "<footer class=\"footer mt-auto bg-dark fixed-bottom\">\n" +
+        "  <div class=\"container align-content-right\">\n" +
+        "    <span id=\"footer\" class=\"text-muted\"></span>\n" +
+        "  </div>\n" +
+        "</footer>";
+    footer.insertAdjacentHTML("afterend", footerGuts);
+    let currentDate = "© 2023 CG, Inc. All rights reserved. \t" + new Date().toLocaleDateString();
+    let footerDate = document.getElementById("footer");
+    footerDate.innerText = currentDate;
 }
